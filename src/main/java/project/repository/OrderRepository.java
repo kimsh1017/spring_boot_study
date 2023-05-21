@@ -77,4 +77,41 @@ public class OrderRepository{
         TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000); //최대 1000건
         return query.getResultList();
     }
+    
+    public List<Order> findAllWithMemberDelivery(){
+        return em.createQuery(
+            "select o from Order o" + 
+            " join fetch o.member m" + 
+            " join fetch o.delivery d", Order.class 
+        ).getResultList();
+    }
+    
+    public List<SimpleOrderDto> findOrderDtos(){
+        return em.createQuery(
+            "select new project.repository.SimpleOrderDto(o.id, m.name, o.orderDate, o.status, d.address)" +
+            " from Order o" + 
+            " join o.member m" +
+            " join o.delivery d", SimpleOrderDto.class )
+            .getResultList();
+    }
+    
+    public List<Order> findAllWithOrderItem(){
+        return em.createQuery(
+            "select distinct o from Order o" +
+            " join fetch o.member m" +
+            " join fetch o.delivery d" +
+            " join fetch o.orderItems oi" +
+            " join fetch oi.item i", Order.class
+        ).getResultList();
+    }
+    
+    public List<Order> findAllWithMemberDelivery(int offset, int limit){
+        return em.createQuery(
+            "select o from Order o" + 
+            " join fetch o.member m" + 
+            " join fetch o.delivery d", Order.class)
+            .setFirstResult(offset)
+            .setMaxResults(limit)
+            .getResultList();
+    }
 }
